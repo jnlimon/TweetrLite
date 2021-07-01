@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!--
-   Keys.plist
-   twitter
-
-   Created by Santino L Ramos on 6/28/21.
-   Copyright (c) 2021 Emerson Malca. All rights reserved.
--->
 <plist version="1.0">
-<dict/>
+<dict>
+	<key>consumer_Secret</key>
+	<string>EbIT0UWpJ38KbXKt7sdv9L5tQK1GdLpdHbAO3MiOhbX4HAwiC9</string>
+	<key>consumer_Key</key>
+	<string>RSOEebmaNC9P37OthQvpHwUZt</string>
+</dict>
 </plist>
