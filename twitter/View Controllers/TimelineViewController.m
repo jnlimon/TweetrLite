@@ -13,11 +13,13 @@
 #import "TweetCell.h"
 #import "UIImageView+AFNetworking.h"
 #import "ComposeViewController.h"
+#import "DetailsViewController.h"
 
 @interface TimelineViewController () <ComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *arrayOfTweets;
+@property (nonatomic, strong) UIRefreshControl *refreshControl;
 
 @end
 
@@ -28,7 +30,14 @@
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     
-    // Get timeline
+    [self fetchTweets];
+    
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(fetchTweets) forControlEvents:UIControlEventValueChanged];
+    [self.tableView insertSubview:self.refreshControl atIndex:0];
+}
+
+- (void)fetchTweets{
     [[APIManager shared] getHomeTimelineWithCompletion:^(NSArray *tweets, NSError *error) {
         if (tweets) {
             self.arrayOfTweets = (NSMutableArray*) tweets;
@@ -37,6 +46,7 @@
         } else {
             NSLog(@"😫😫😫 Error getting home timeline: %@", error.localizedDescription);
         }
+        [self.refreshControl endRefreshing];
     }];
 }
 
@@ -77,7 +87,6 @@
     
     NSString *URLString = tweet.user.profilePicture;
     NSURL *url = [NSURL URLWithString:URLString];
-    NSData *urlData = [NSData dataWithContentsOfURL:url];
     
     [tweetCell.profileImage setImageWithURL:url];
 
@@ -94,9 +103,24 @@
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    UINavigationController *navigationController = [segue destinationViewController];
-    ComposeViewController *composeController = (ComposeViewController*)navigationController.topViewController;
-    composeController.delegate = self;
+    if([segue.identifier  isEqual: @"compose"] ){
+        //pass personal profile to ComposeViewController to display profile picture
+        UINavigationController *navigationController = [segue destinationViewController];
+        ComposeViewController *composeController = (ComposeViewController*)navigationController.topViewController;
+        composeController.delegate = self;
+    }
+    if([segue.identifier  isEqual: @"details"]){
+        //pass tweet to DetailsViewController to display tweet details
+        UITableViewCell *tappedCell = sender;
+        NSIndexPath *indexPath = [self.tableView indexPathForCell:tappedCell];
+        Tweet *tweet = self.arrayOfTweets[indexPath.row];
+    
+        DetailsViewController *detailsController = [segue destinationViewController];
+        detailsController.tweet = tweet;
+    }
+    
+    
+
 }
 
 
