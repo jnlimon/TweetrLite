@@ -105,7 +105,6 @@ static NSString * const baseURLString = @"https://api.twitter.com";
 
     NSString *urlString = [NSString stringWithFormat:@"1.1/statuses/retweet/%@.json", tweet.idStr];
     NSDictionary *parameters = @{@"tweet_mode":@"extended"};
-    NSLog(@"%@", tweet.idStr);
     [self POST:urlString parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSDictionary *  _Nullable tweetDictionary) {
         Tweet *tweet = [[Tweet alloc]initWithDictionary:tweetDictionary];
         completion(tweet, nil);

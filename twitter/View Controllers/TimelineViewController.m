@@ -44,7 +44,7 @@
             [self.tableView reloadData];
             
         } else {
-            NSLog(@"😫😫😫 Error getting home timeline: %@", error.localizedDescription);
+            [self displayError:error.localizedDescription];
         }
         [self.refreshControl endRefreshing];
     }];
@@ -57,7 +57,6 @@
 
 
 - (IBAction)logOut:(id)sender {
-    NSLog(@"HELLO");
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
 
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
@@ -67,7 +66,6 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    //return self.arrayOfTweets.count;
     return self.arrayOfTweets.count;
 }
 
@@ -77,19 +75,15 @@
     Tweet *tweet = self.arrayOfTweets[indexPath.row];
     tweetCell.tweet = tweet;
     tweetCell.nameLabel.text = tweet.user.name;
-    tweetCell.screenNameLabel.text = tweet.user.screenName;
+    tweetCell.screenNameLabel.text = [NSString stringWithFormat:@"@%@",tweet.user.screenName];
     tweetCell.createdAtLabel.text = tweet.createdAtString;
     tweetCell.retweetedCountLabel.text = [NSString stringWithFormat:@"%d",tweet.retweetCount];
     tweetCell.favoritedCountLabel.text = [NSString stringWithFormat:@"%d",tweet.favoriteCount];
     tweetCell.tweetLabel.text = tweet.text;
     tweetCell.retweetButton.selected = tweet.retweeted;
     tweetCell.favoriteButton.selected = tweet.favorited;
+    [self setProfileImage:tweet.user.profilePicture:tweetCell];
     
-    NSString *URLString = tweet.user.profilePicture;
-    NSURL *url = [NSURL URLWithString:URLString];
-    
-    [tweetCell.profileImage setImageWithURL:url];
-
     return tweetCell;
 }
 
@@ -98,6 +92,23 @@
     [self.tableView reloadData];
 }
 
+- (void)setProfileImage:(NSString*)path:(TweetCell*)tweetCell{
+    NSURL *url = [NSURL URLWithString:path];
+    [tweetCell.profileImage setImageWithURL:url];
+}
+
+- (void) displayError:(NSString*)err{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Cannot Load Tweets"message:err preferredStyle:(UIAlertControllerStyleAlert)];
+    UIAlertAction *tryAgainAction = [UIAlertAction actionWithTitle:@"Try Again"style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        [self fetchTweets];
+    }];
+    // add the 'try again' action to the alertController
+    [alert addAction:tryAgainAction];
+    
+    [self presentViewController:alert animated:YES completion:^{
+    }];
+    
+}
 
 #pragma mark - Navigation
 

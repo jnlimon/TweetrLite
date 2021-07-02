@@ -24,88 +24,81 @@
 }
 - (IBAction)didTapFavorite:(id)sender {
     if(self.tweet.favorited == false){
-        // favorite button
-        self.tweet.favorited = YES;
-        self.tweet.favoriteCount += 1;
-        
-        [self refreshData];
-        
         [[APIManager shared] favorite:self.tweet completion:^(Tweet *tweet, NSError *error) {
              if(error){
-                  NSLog(@"Error favoriting tweet: %@", error.localizedDescription);
+                 [self displayError:@"Favorite"];
              }
              else{
-                 NSLog(@"Successfully favorited the following Tweet: %@", tweet.text);
+                 self.tweet.favorited = true;
+                 self.tweet.favoriteCount += 1;
+                 [self refreshData];
              }
          }];
     }
     else{
-        //unfavorite button
-        self.tweet.favorited = NO;
-        self.tweet.favoriteCount -= 1;
-        
-        [self refreshData];
-        
         [[APIManager shared] unfavorite:self.tweet completion:^(Tweet *tweet, NSError *error) {
              if(error){
-                  NSLog(@"Error unfavoriting tweet: %@", error.localizedDescription);
+                 [self displayError:@"Unfavorite"];
              }
              else{
-                 NSLog(@"Successfully unfavorited the following Tweet: %@", tweet.text);
+                 self.tweet.favorited = false;
+                 self.tweet.favoriteCount -= 1;
+                 [self refreshData];
              }
          }];
     }
-    
+   
 }
 
 - (IBAction)didTapRetweet:(id)sender {
     if(self.tweet.retweeted == false){
-        //retweet button
-        self.tweet.retweeted = YES;
-        self.tweet.retweetCount += 1;
-        
-        [self refreshData];
-        
         [[APIManager shared] retweet:self.tweet completion:^(Tweet *tweet, NSError *error) {
              if(error){
-                  NSLog(@"Error retweeting tweet: %@", error.localizedDescription);
+                 [self displayError:@"Retweet"];
              }
              else{
-                 NSLog(@"Successfully retweeted the following Tweet: %@", tweet.text);
+                 self.tweet.retweeted = true;
+                 self.tweet.retweetCount += 1;
+                 [self refreshData];
              }
          }];
     }
     else{
-        //unretweet button
-        self.tweet.retweeted = NO;
-        self.tweet.retweetCount -= 1;
-        
-        [self refreshData];
-        
         [[APIManager shared] unretweet:self.tweet completion:^(Tweet *tweet, NSError *error) {
              if(error){
-                  NSLog(@"Error unretweeting tweet: %@", error.localizedDescription);
+                 [self displayError:@"Unretweet"];
              }
              else{
-                 NSLog(@"Successfully unretweeted the following Tweet: %@", tweet.text);
+                 self.tweet.retweeted = false;
+                 self.tweet.retweetCount -= 1;
+                 [self refreshData];
              }
          }];
-        
     }
-    
 }
 
 - (void)refreshData{
-    //self.nameLabel.text = self.tweet.user.name;
-    //self.tweetLabel.text = self.tweet.text;
-    //self.screenNameLabel.text = self.tweet.user.screenName;
-    //self.createdAtLabel.text = self.tweet.createdAtString;
     self.retweetedCountLabel.text = [NSString stringWithFormat:@"%d",self.tweet.retweetCount];
     self.favoritedCountLabel.text = [NSString stringWithFormat:@"%d",self.tweet.favoriteCount];
     self.favoriteButton.selected = self.tweet.favorited;
     self.retweetButton.selected = self.tweet.retweeted;
-    
 }
 
+- (void) displayError:(NSString*)action{
+    NSString *errTitle = [NSString stringWithFormat:@"%@ Failed", action];
+    NSString *errMessage =[NSString stringWithFormat:@"Your %@ action could not be processed", action];
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:errTitle message:errMessage preferredStyle:(UIAlertControllerStyleAlert)];
+    
+    UIAlertAction *OkAction = [UIAlertAction actionWithTitle:@"OK"style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+    }];
+    
+    // add the 'Ok' action to the alertController
+    [alert addAction:OkAction];
+    
+    [[[[UIApplication sharedApplication] keyWindow]rootViewController]presentViewController:alert animated:true completion:^{
+    }];
+    
+}
 
 @end
